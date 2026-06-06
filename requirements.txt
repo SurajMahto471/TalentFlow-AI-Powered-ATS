@@ -10,5 +10,5 @@ pandas>=2.0.0
 numpy>=1.24.0
 plotly>=5.18.0
 pydantic>=2.0.0
-# Install the exact spaCy model wheel to ensure the named package is available during builds
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+# The spaCy model will be installed in a post-build step to avoid long wheel installs during
+# the dependency resolver phase on some build platforms.

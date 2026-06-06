@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# postBuild script for Streamlit Cloud/other builders
+# Install the spaCy English model after Python packages are installed
+python -m spacy download en_core_web_sm
