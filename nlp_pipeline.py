@@ -4,10 +4,53 @@ import re
 from typing import List
 
 import spacy
+from typing import Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-_nlp = spacy.load("en_core_web_sm")
+def _load_spacy_model(name: str = "en_core_web_sm") -> spacy.language.Language:
+    """Robustly load a spaCy model.
+
+    Strategy:
+    1. Try `spacy.load(name)`.
+    2. Try importing the model package (en_core_web_sm) and calling `.load()`.
+    3. Try `spacy.cli.download(name)` then `spacy.load(name)`.
+    4. Fall back to `spacy.blank('en')`.
+    """
+    import importlib
+    import sys
+
+    try:
+        return spacy.load(name)
+    except Exception as e1:  # pragma: no cover - runtime environments differ
+        print(f"spacy.load('{name}') failed: {e1}")
+
+    # Try to import the model module directly (installed via pip as en-core-web-sm)
+    try:
+        mod_name = name.replace("-", "_")
+        model_mod = importlib.import_module(mod_name)
+        try:
+            return model_mod.load()
+        except Exception as e_mod_load:
+            print(f"{mod_name}.load() failed: {e_mod_load}")
+    except Exception as e2:
+        print(f"import of model package failed: {e2}")
+
+    # Try to use spaCy's download helper
+    try:
+        from spacy.cli import download as _spacy_download
+
+        _spacy_download(name)
+        return spacy.load(name)
+    except Exception as e3:
+        print(f"spaCy download/load attempt failed: {e3}")
+
+    # Final fallback: blank English model
+    print("Falling back to spaCy blank('en') model. Some NER/lemmatization may be limited.")
+    return spacy.blank("en")
+
+
+_nlp = _load_spacy_model()
 
 
 def clean_text(text: str) -> str:
