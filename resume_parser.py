@@ -10,37 +10,7 @@ from document_extractor import extract_candidate_name_from_filename
 from models import ParsedResume
 from nlp_pipeline import clean_text, extract_skills_from_text
 
-def _load_spacy_model(name: str = "en_core_web_sm") -> spacy.language.Language:
-    import importlib
-
-    try:
-        return spacy.load(name)
-    except Exception as e1:  # pragma: no cover
-        print(f"spacy.load('{name}') failed: {e1}")
-
-    try:
-        mod_name = name.replace("-", "_")
-        model_mod = importlib.import_module(mod_name)
-        try:
-            return model_mod.load()
-        except Exception as e_mod:
-            print(f"{mod_name}.load() failed: {e_mod}")
-    except Exception as e2:
-        print(f"import of model package failed: {e2}")
-
-    try:
-        from spacy.cli import download as _spacy_download
-
-        _spacy_download(name)
-        return spacy.load(name)
-    except Exception as e3:
-        print(f"spaCy download/load attempt failed: {e3}")
-
-    print("Falling back to spaCy blank('en') model. NER and some features will be limited.")
-    return spacy.blank("en")
-
-
-_nlp = _load_spacy_model()
+_nlp = spacy.load("en_core_web_sm")
 
 
 def extract_email(text: str) -> str:

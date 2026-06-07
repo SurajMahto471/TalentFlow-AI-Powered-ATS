@@ -1,9 +1,11 @@
 """Application configuration, scoring weights, and skill taxonomy."""
 
+import os
 from pathlib import Path
 
-# Database
-DB_PATH = Path(__file__).parent / "ats_database.db"
+# Database (override with DATABASE_PATH env var in Docker/production)
+_db_env = os.environ.get("DATABASE_PATH")
+DB_PATH = Path(_db_env) if _db_env else Path(__file__).parent / "ats_database.db"
 
 # ATS scoring weights (must sum to 1.0)
 SKILL_WEIGHT = 0.50

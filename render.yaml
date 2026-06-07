@@ -17,3 +17,15 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: "3.11.9"
+
+  - type: web
+    name: talentflow-streamlit
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile.streamlit
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: ENV
+        value: production
