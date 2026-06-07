@@ -3,10 +3,9 @@ version: 1
 services:
   - type: web
     name: ats-backend
-    env: python
+    env: docker
     plan: free
-    buildCommand: pip install --upgrade pip setuptools wheel && pip install --prefer-binary -r requirements.txt && python -m spacy download en_core_web_sm
-    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: Dockerfile
     healthCheckPath: /health
     env:
       - key: ENV
