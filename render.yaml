@@ -11,6 +11,17 @@ services:
       - key: ENV
         value: production
 
+  - type: web
+    name: ats-streamlit
+    env: python
+    plan: free
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install --prefer-binary -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+    healthCheckPath: /
+    env:
+      - key: ENV
+        value: production
+
 staticSites:
   - name: ats-frontend
     path: frontend
