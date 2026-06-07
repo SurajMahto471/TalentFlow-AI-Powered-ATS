@@ -1,36 +1,19 @@
-version: 1
+# Render Blueprint — backend API only (frontend on Vercel)
+# Dashboard: New > Blueprint > connect repo, or create Web Service manually with these settings.
 
 services:
   - type: web
-    name: ats-backend
-    env: docker
+    name: talentflow-api
+    runtime: docker
     plan: free
-    dockerfilePath: Dockerfile
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
-    env:
-      - key: ENV
-        value: production
-
-  - type: web
-    name: ats-streamlit
-    env: python
-    plan: free
-    buildCommand: pip install --upgrade pip setuptools wheel && pip install --prefer-binary -r requirements.txt
-    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
-    healthCheckPath: /
-    env:
-      - key: ENV
-        value: production
-
-staticSites:
-  - name: ats-frontend
-    path: frontend
-    buildCommand: npm ci && npm run build
-    publishPath: dist
-    env:
-      - key: API_BASE
-        value: /
-
-# Notes:
-# - Replace plans and add region as needed in Render UI or CLI.
-# - For secrets (DATABASE_URL, SECRET_KEY) create Render secrets and reference them in the Render dashboard or change `env` entries to `fromSecret` mappings.
+    envVars:
+      - key: DATABASE_PATH
+        value: /tmp/ats_database.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.11.9"
