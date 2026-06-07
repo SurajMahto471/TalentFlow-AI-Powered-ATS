@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://talentflow-ai-powered-ats.onrender.com/:splat"
+    }
+  ]
+}
