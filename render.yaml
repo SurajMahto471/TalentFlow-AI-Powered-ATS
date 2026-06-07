@@ -1,0 +1,26 @@
+version: 1
+
+services:
+  - type: web
+    name: ats-backend
+    env: python
+    plan: free
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install --prefer-binary -r requirements.txt && python -m spacy download en_core_web_sm
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    env:
+      - key: ENV
+        value: production
+
+staticSites:
+  - name: ats-frontend
+    path: frontend
+    buildCommand: npm ci && npm run build
+    publishPath: dist
+    env:
+      - key: API_BASE
+        value: /
+
+# Notes:
+# - Replace plans and add region as needed in Render UI or CLI.
+# - For secrets (DATABASE_URL, SECRET_KEY) create Render secrets and reference them in the Render dashboard or change `env` entries to `fromSecret` mappings.
