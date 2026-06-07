@@ -54,3 +54,4 @@ build/
 
 # IDE files
 .idea/
+.venv311/
