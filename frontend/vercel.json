@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://talentflow-ai-powered-ats.onrender.com/:splat"
+      "source": "/api/:splat*",
+      "destination": "https://talentflow-ai-powered-ats.onrender.com/:splat*"
     }
   ]
 }
