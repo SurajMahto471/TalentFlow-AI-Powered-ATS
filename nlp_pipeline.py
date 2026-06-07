@@ -3,54 +3,46 @@
 import re
 from typing import List
 
-import spacy
-from typing import Optional
+try:
+    import spacy
+except ImportError:  # pragma: no cover - behavior exercised in integration
+    spacy = None
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-def _load_spacy_model(name: str = "en_core_web_sm") -> spacy.language.Language:
-    """Robustly load a spaCy model.
-
-    Strategy:
-    1. Try `spacy.load(name)`.
-    2. Try importing the model package (en_core_web_sm) and calling `.load()`.
-    3. Try `spacy.cli.download(name)` then `spacy.load(name)`.
-    4. Fall back to `spacy.blank('en')`.
-    """
-    import importlib
-    import sys
-
+_nlp = None
+if spacy:
     try:
-        return spacy.load(name)
-    except Exception as e1:  # pragma: no cover - runtime environments differ
-        print(f"spacy.load('{name}') failed: {e1}")
+        _nlp = spacy.load("en_core_web_sm")
+    except Exception:
+        _nlp = None
 
-    # Try to import the model module directly (installed via pip as en-core-web-sm)
-    try:
-        mod_name = name.replace("-", "_")
-        model_mod = importlib.import_module(mod_name)
-        try:
-            return model_mod.load()
-        except Exception as e_mod_load:
-            print(f"{mod_name}.load() failed: {e_mod_load}")
-    except Exception as e2:
-        print(f"import of model package failed: {e2}")
-
-    # Try to use spaCy's download helper
-    try:
-        from spacy.cli import download as _spacy_download
-
-        _spacy_download(name)
-        return spacy.load(name)
-    except Exception as e3:
-        print(f"spaCy download/load attempt failed: {e3}")
-
-    # Final fallback: blank English model
-    print("Falling back to spaCy blank('en') model. Some NER/lemmatization may be limited.")
-    return spacy.blank("en")
-
-
-_nlp = _load_spacy_model()
+# Minimal stop-word list used when spaCy is not available. Keep small to avoid
+# adding heavy dependencies; sufficient for a temporary fallback tokenizer.
+_FALLBACK_STOP_WORDS = {
+    "a",
+    "an",
+    "and",
+    "the",
+    "or",
+    "in",
+    "on",
+    "for",
+    "to",
+    "of",
+    "with",
+    "by",
+    "is",
+    "are",
+    "was",
+    "were",
+    "it",
+    "this",
+    "that",
+    "as",
+    "be",
+    "from",
+}
 
 
 def clean_text(text: str) -> str:
@@ -75,12 +67,18 @@ def clean_text(text: str) -> str:
     cleaned = re.sub(r"[^a-z0-9\s/+.-]", " ", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
-    doc = _nlp(cleaned)
-    tokens = [
-        token.text
-        for token in doc
-        if not token.is_stop and not token.is_space and token.text.strip()
-    ]
+    if _nlp:
+        doc = _nlp(cleaned)
+        tokens = [
+            token.text
+            for token in doc
+            if not token.is_stop and not token.is_space and token.text.strip()
+        ]
+    else:
+        # Fallback simple tokenizer: split on whitespace and remove a small
+        # set of common stop words and punctuation.
+        parts = re.split(r"\s+", cleaned)
+        tokens = [t for t in parts if t and t not in _FALLBACK_STOP_WORDS]
 
     result = " ".join(tokens)
     if not result and cleaned:
