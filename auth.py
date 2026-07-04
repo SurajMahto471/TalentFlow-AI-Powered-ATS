@@ -5,7 +5,7 @@ import re
 import secrets
 from typing import Any, Optional
 
-from user_db import get_user_by_email, get_user_by_id, init_user_db, save_user, update_user_profile
+from database import get_user_by_email, get_user_by_id, save_user, update_user_profile_profile
 
 
 def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
@@ -78,7 +78,7 @@ def register_user(
     Returns:
         Tuple of (success, message).
     """
-    init_user_db()
+   
 
     full_name = full_name.strip()
     email = email.strip().lower()
@@ -109,7 +109,7 @@ def authenticate_user(email: str, password: str) -> tuple[bool, str, Optional[di
     Returns:
         Tuple of (success, message, user_dict_or_none).
     """
-    init_user_db()
+    
     user = get_user_by_email(email.strip().lower())
     if not user:
         return False, "Invalid email or password.", None
