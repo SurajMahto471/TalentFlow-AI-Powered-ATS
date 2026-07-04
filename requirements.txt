@@ -13,3 +13,4 @@ pydantic>=2.0.0
 gunicorn>=20.1.0
 # spaCy small English model (installed as a wheel to avoid `python -m spacy download` during build)
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+psycopg2-binary>=2.9.9
