@@ -22,6 +22,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
+@app.get("/")
+def root():
+    return {"status": "AI-Powered ATS API is running", "docs": "/docs"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
