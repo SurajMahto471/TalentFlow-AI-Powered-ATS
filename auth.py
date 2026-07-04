@@ -5,8 +5,7 @@ import re
 import secrets
 from typing import Any, Optional
 
-from database import get_user_by_email, get_user_by_id, save_user, update_user_profile_profile
-
+from database import get_user_by_email, get_user_by_id, save_user, update_user_profile
 
 def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
     """
